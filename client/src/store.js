@@ -1,11 +1,26 @@
-import { createStore, applyMiddleware, compose } from 'redux';
+import {
+  reactReduxFirebase,
+  getFirebase
+} from 'react-redux-firebase';
+import {
+  createStore,
+  applyMiddleware,
+  compose
+} from 'redux';
 import thunk from 'redux-thunk';
 import rootReducer from './modules';
+
+const fbConfig = {
+  apiKey: process.env.REACT_APP_API_KEY,
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_DATABASE_URL,
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET
+};
 
 const initialState = {};
 const enhancers = [];
 const middleware = [
-  thunk
+  thunk.withExtraArgument(getFirebase)
 ];
 
 if (process.env.NODE_ENV === 'development') {
@@ -18,6 +33,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const composedEnhancers = compose(
   applyMiddleware(...middleware),
+  reactReduxFirebase(fbConfig),
   ...enhancers
 );
 

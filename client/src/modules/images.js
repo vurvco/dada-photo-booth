@@ -1,13 +1,15 @@
 import {
   getImageUrls,
-  filenames,
   subset
 } from './storage';
 
+export const FILENAMES = 'images/FILENAMES';
+export const FILENAMES_REQUESTED = 'images/FILENAMES_REQUESTED';
 export const RETRIEVE_REQUESTED = 'images/RETRIEVE_REQUESTED';
 export const RETRIEVE = 'images/RETRIEVE';
 
 const initialState = {
+  filenames: [],
   urls: [],
   isRetrieving: false
 };
@@ -28,22 +30,52 @@ export default (state = initialState, action) => {
         isRetrieving: !state.isRetrieving
       };
 
+    case FILENAMES_REQUESTED:
+      return {
+        ...state,
+        filenames: [],
+        isRetrieving: true
+      };
+
+    case FILENAMES:
+      return {
+        ...state,
+        filenames: action.filenames,
+        isRetrieving: !state.isRetrieving
+      };
+
     default:
       return state;
   }
 };
 
 export const retrieve = () => {
-  return async (dispatch) => {
+  return async (dispatch, getState, getFirebase) => {
+    const firebase = getFirebase();
+    const filenameRef = firebase.database().ref('fall-event-2017/filenames');
+
     dispatch({
-      type: RETRIEVE_REQUESTED
+      type: FILENAMES_REQUESTED
     });
 
-    const urls = await getImageUrls(filenames);
+    filenameRef.on('value', async (snapshot) => {
+      const filenames = snapshot.val();
+      console.log({ filenames });
 
-    return dispatch({
-      type: RETRIEVE,
-      urls: subset(urls, 8)
+      dispatch({
+        type: FILENAMES,
+        filenames
+      });
+
+      dispatch({
+        type: RETRIEVE_REQUESTED
+      });
+      const urls = await getImageUrls(filenames);
+
+      return dispatch({
+        type: RETRIEVE,
+        urls: subset(urls, 4)
+      });
     });
   };
 };
