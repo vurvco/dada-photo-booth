@@ -3,9 +3,16 @@ body, html {
   margin: 0;
 }
 
+body, div#root {
+  height: 100vh;
+  width: 100vw;
+}
+
 div.images {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  height: 100vh;
+  width: 100vw;
 
   /*
   todo: change this file to SCSS
@@ -19,14 +26,32 @@ div.images {
   */
 }
 
-div.image {
+div.images div.newest {
+  display: flex;
+  height: 100vh;
+  width: 50vw;
+  justify-content: center;
+  align-items: center;
+}
+
+div.images div.newest img {
+  height: 100vh;
+  width: 50vw;
+}
+
+div.images div.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+div.images div.grid div.image {
   background-color: #0069b3;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-div.image img {
-  height: 380px;
-  width: 290px;
+div.images div.grid div.image img {
+  height: 50vh;
+  width: 25vw;
 }
