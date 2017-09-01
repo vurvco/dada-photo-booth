@@ -29,7 +29,10 @@ export const getImageUrls = async (filenames) => {
   }));
 };
 
-// Because we want to include the newest image first
 export const subset = (arr, num) => {
-  return [arr[0], ...sampleSize(arr, num)];
+  // Because we want to include the newest image first,
+  // but not twice
+  const theRest = arr.slice(0, -1);
+  const last = arr.slice(arr.length - 1);
+  return [last, ...sampleSize(theRest, num)];
 };
