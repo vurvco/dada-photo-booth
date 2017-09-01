@@ -1,0 +1,32 @@
+body, html {
+  padding: 0;
+  margin: 0;
+}
+
+div.images {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+
+  /*
+  todo: change this file to SCSS
+  @media screen and (min-width: 500px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  @media screen and (min-width: 800px) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+  */
+}
+
+div.image {
+  background-color: #0069b3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+div.image img {
+  height: 380px;
+  width: 290px;
+}
