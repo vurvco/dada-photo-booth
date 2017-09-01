@@ -1,6 +1,6 @@
 FROM node:8.4
 
-### SETUP
+### SOFTWARE SETUP
 RUN apt-get update
 
 # Get and install Processing
@@ -14,15 +14,13 @@ RUN bash -c "ln -s /opt/processing/{processing,processing-java} /usr/local/bin/"
 
 RUN apt-get -y install gifsicle
 
-### SYSTEM PREP
-
+### SERVER PREP
 RUN mkdir -p /usr/src/dpb
-RUN mkdir -p /usr/src/dpb/glitched # For temp file storage
+# For temp file storage
+RUN mkdir -p /usr/src/dpb/glitched
 WORKDIR /usr/src/dpb
 COPY . .
-# RUN yarn
+RUN yarn --production
 
 EXPOSE 8888
-
-# start a server, listening for image uploads for processing and POSTing to Twitter
-# RUN yarn start
+CMD ["yarn", "start"]

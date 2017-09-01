@@ -1,0 +1,33 @@
+{
+  "name": "dada-photo-booth",
+  "version": "1.0.0",
+  "description": "Containerized version of the Dada Photo Booth",
+  "main": "index.js",
+  "scripts": {
+    "dev": "chokidar '**/*.js' -c 'semistandard && ava'",
+    "lint": "semistandard",
+    "start": "node index.js",
+    "test": "NODE_ENV=test ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vurvco/dada-photo-booth.git"
+  },
+  "author": "Chris B & Adam D",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vurvco/dada-photo-booth/issues"
+  },
+  "homepage": "https://github.com/vurvco/dada-photo-booth#readme",
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "chokidar-cli": "^1.2.0",
+    "semistandard": "^11.0.0"
+  },
+  "dependencies": {
+    "good": "^7.3.0",
+    "good-console": "^6.4.0",
+    "good-squeeze": "^5.0.2",
+    "hapi": "^16.5.2"
+  }
+}

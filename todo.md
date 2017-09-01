@@ -10,6 +10,7 @@
       - [ ] @mention the uploader
     - [ ] POSTing images to Firebase
     - [ ] file cleanup
+- [ ] investigate Alpine linux because fml, 1+ GB
 
 - [x] copy over brandy-bunch-frontend
 - [x] modify Firebase code
