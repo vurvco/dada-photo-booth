@@ -3,6 +3,7 @@
 - [x] create Dockerfile that has all the necessary parts
   - [ ] server that accepts images POSTed to /camera_upload
     - [ ] store the username of the uploader when it's there
+  - [ ] set twitter process.env variables -- see snag for ideas
   - [ ] mechanism for kicking off...
     - [ ] Processing
     - [ ] gifsicle

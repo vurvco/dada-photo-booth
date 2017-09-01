@@ -3,6 +3,10 @@
 const Hapi = require('hapi');
 const Good = require('good');
 
+const gifOut = require('./lib/gifOut');
+const postImg = require('./lib/postImg');
+
+// Logging options
 const goodOpts = {
   register: Good,
   options: {
@@ -26,16 +30,31 @@ const server = new Hapi.Server();
 module.exports.server = server;
 
 server.connection({
-  host: '0.0.0.0',
-  port: 8888 // must match exposed port in Dockerfile
+  host: '0.0.0.0',    // seems necessary, rather than localhost, for Docker
+  port: 8888,         // must match exposed port in Dockerfile
+  routes: {
+    cors: true
+  }
 });
 
 server.route({
   method: 'GET',
   path: '/hello',
   handler: function (request, reply) {
-    return reply('hello world');
+    return reply('hola mundo');
   }
+});
+
+server.route({
+  method: 'POST',
+  path: '/fromIfttt',
+  handler: gifOut
+});
+
+server.route({
+  method: 'POST',
+  path: '/fromUs',
+  handler: gifOut
 });
 
 // Start the server
