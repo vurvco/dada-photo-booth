@@ -11,8 +11,8 @@
     [ ] POSTing images to Firebase
     [ ] file cleanup
 
-[ ] copy over brandy-bunch-frontend
+[x] copy over brandy-bunch-frontend
 [ ] modify Firebase code
   [ ] display the latest upload + four random others
-[ ] modify layout
-  [ ] one big image + a grid of four to the side
+[x] modify layout
+  [x] one big image + a grid of four to the side
