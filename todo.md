@@ -12,7 +12,10 @@
     [ ] file cleanup
 
 [x] copy over brandy-bunch-frontend
-[ ] modify Firebase code
-  [ ] display the latest upload + four random others
+[x] modify Firebase code
+  [x] display the latest upload + four random others
 [x] modify layout
   [x] one big image + a grid of four to the side
+
+[ ] app to take photos
+  [ ] POST photos
