@@ -4,8 +4,10 @@
   "description": "Containerized version of the Dada Photo Booth",
   "main": "index.js",
   "scripts": {
+    "build-image": "docker build -t dpb .",
     "dev": "chokidar '**/*.js' -c 'semistandard && ava'",
     "lint": "semistandard",
+    "run-image": "docker run -p 49160:8888 -d dpb",
     "start": "node index.js",
     "test": "NODE_ENV=test ava"
   },

@@ -4,13 +4,19 @@ import Webcam from 'react-webcam';
 
 import './App.css';
 
-const postUrl = 'http://cors-anywhere.herokuapp.com/https://requestb.in/r2gkeyr2';
+// For RequestBin
+// const postUrl = 'http://cors-anywhere.herokuapp.com/https://requestb.in/r2gkeyr2';
+// For Docker
+// const postUrl = 'http://localhost:49160/camera_upload';
+// For Node
+const postUrl = 'http://localhost:8888/camera_upload';
+// todo: add `/camera_upload` to postUrl
 
 const postOptions = src => ({
   method: 'POST',
-  body: JSON.stringify(src),
+  body: JSON.stringify({ image: src }),
   headers: {
-    'Content-Type': 'image/jpeg'
+    'Content-Type': 'application/json'
   }
 });
 
@@ -39,11 +45,15 @@ class App extends Component {
     fetch(postUrl, postOptions(imageSrc))
       .then(res => {
         console.log({ res });
-        this.showAlert('Photo Uploaded', 'success');
+        if (res.ok) {
+          this.showAlert('Photo Uploaded', 'success');
+        } else {
+          this.showAlert(`Upload Error: ${res.statusText}`, 'error');
+        }
       })
       .catch(err => {
         console.error({ err });
-        this.showAlert(`Photo Error: ${err.message}`, 'error');
+        this.showAlert(`Upload Error: ${err.message}`, 'error');
       });
   }
 

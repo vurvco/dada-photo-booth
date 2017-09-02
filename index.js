@@ -3,8 +3,7 @@
 const Hapi = require('hapi');
 const Good = require('good');
 
-const gifOut = require('./lib/gifOut');
-const postImg = require('./lib/postImg');
+const { gifOut } = require('./lib/gifOut');
 
 // Logging options
 const goodOpts = {
@@ -39,21 +38,21 @@ server.connection({
 
 server.route({
   method: 'GET',
-  path: '/hello',
+  path: '/health',
   handler: function (request, reply) {
-    return reply('hola mundo');
+    return reply('they live\n');
   }
 });
 
 server.route({
   method: 'POST',
-  path: '/fromIfttt',
-  handler: gifOut
-});
-
-server.route({
-  method: 'POST',
-  path: '/fromUs',
+  path: '/camera_upload',
+  config: {
+    payload: {
+      output: 'data',
+      parse: false
+    }
+  },
   handler: gifOut
 });
 

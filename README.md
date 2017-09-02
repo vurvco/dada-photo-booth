@@ -14,5 +14,5 @@ Includes camera app for sending photos to be glitched
 
 ### Docker
 - To build the image: `docker build -t dpb .`
-- To run the image in the background: `docker run -rm -p 49160:8888 -d dpb`
+- To run the image in the background: `docker run -p 49160:8888 -d dpb`
 - To get logs: `docker logs <CONTAINER_ID>`
