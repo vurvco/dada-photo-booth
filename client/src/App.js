@@ -10,15 +10,11 @@ import { retrieve } from './modules/images';
 import oneGif from './img/1.gif';
 import twoGif from './img/2.gif';
 import threeGif from './img/3.gif';
-import fourGif from './img/4.gif';
-import fiveGif from './img/5.gif';
 
 const placeholders = [
   oneGif,
   twoGif,
   threeGif,
-  fourGif,
-  fiveGif
 ];
 
 export class App extends React.Component {
