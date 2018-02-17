@@ -12,6 +12,11 @@ Includes camera app for sending photos to be glitched
 
 ## Development
 
+_todo: add note about tech and program prereqs, eg, npm, node, etc_
+
+- Run `npm install && npm start` in the `server` directory.
+- Run `npm install && npm start` in the `client` directory.
+
 ### Docker
 - To build the image: `docker build -t dpb .`
 - To run the image in the background: `docker run -p 49160:8888 -d dpb`

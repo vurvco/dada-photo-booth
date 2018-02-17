@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import AlertContainer from 'react-alert'
+import AlertContainer from 'react-alert';
 import Webcam from 'react-webcam';
 
 import './App.css';
@@ -26,27 +26,49 @@ const alertOptions = {
   theme: 'dark',
   time: 5000,
   transition: 'scale'
-}
+};
+
+
+const Processing = () => (<div>Adam's cool shit!</div>);
+
+const Camera = ({ setRef, capture }) => (
+  <div className="camera">
+    <Webcam
+      audio={false}
+      height={window.innerHeight}
+      ref={setRef}
+      screenshotFormat='image/jpeg'
+      width={window.innerWidth}
+    />
+    <button onClick={capture}>GIF it</button>
+  </div>
+);
 
 class App extends Component {
-  showAlert = (text, type) => {
-    this.msg.show(text, {
-      type,
-      time: 3000
-    })
+  constructor(props) {
+    super(props);
+    this.state = {isGenerating: false};
   }
 
   setRef = (webcam) => {
     this.webcam = webcam;
   }
 
+  showAlert = (text, type) => {
+    this.msg.show(text, {
+      type,
+      time: 3000
+    });
+  };
+
   capture = () => {
     const imageSrc = this.webcam.getScreenshot();
-    fetch(postUrl, postOptions(imageSrc))
+    window.fetch(postUrl, postOptions(imageSrc))
       .then(res => {
         console.log({ res });
         if (res.ok) {
           this.showAlert('Photo Uploaded', 'success');
+          this.setState({ isGenerating: true });
         } else {
           this.showAlert(`Upload Error: ${res.statusText}`, 'error');
         }
@@ -60,15 +82,10 @@ class App extends Component {
   render () {
     return (
       <div className='App'>
-        <AlertContainer ref={a => this.msg = a} {...alertOptions} />
-        <Webcam
-          audio={false}
-          height={window.innerHeight}
-          ref={this.setRef}
-          screenshotFormat='image/jpeg'
-          width={window.innerWidth}
-        />
-        <button onClick={this.capture}>GIF it</button>
+        <AlertContainer ref={a => { this.msg = a; }} {...alertOptions} />
+        {this.state.isGenerating
+          ? <Processing />
+          : <Camera setRef={this.setRef} capture={this.capture} />}
       </div>
     );
   }
