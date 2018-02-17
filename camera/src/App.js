@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 // import AlertContainer from 'react-alert';
-// import Webcam from 'react-webcam';
 
 import './App.css';
 
 require('tracking');
 require('tracking/build/data/face');
+
+const SPACEBAR_KEYCODE = '32';
 
 const postUrl = 'http://localhost:8888/camera_upload';
 
@@ -25,7 +26,7 @@ const postOptions = src => ({
 //   transition: 'scale'
 // };
 
-// const Processing = () => (<div><p>Adam\'s cool shit!</p></div>);
+const Processing = () => (<div><p>Adam\'s cool shit!</p></div>);
 
 // const Camera = ({ setRef, capture }) => (
 //   <div className='camera'>
@@ -43,8 +44,15 @@ const postOptions = src => ({
 export default class App extends Component {
   constructor (props) {
     super(props);
-    this.state = {};
+    this.state = {isGenerating: false};
     this.tracker = null;
+    this.captureOnKeyDown = this.captureOnKeyDown.bind(this);
+  }
+
+  captureOnKeyDown (event) {
+    if (event.keyCode.toString() === SPACEBAR_KEYCODE) {
+      this.capture();
+    }
   }
 
   capture () {
@@ -68,6 +76,8 @@ export default class App extends Component {
   }
 
   componentDidMount () {
+    document.addEventListener('keydown', this.captureOnKeyDown, false);
+
     this.tracker = new window.tracking.ObjectTracker('face');
     this.tracker.setInitialScale(4);
     this.tracker.setStepSize(2);
@@ -95,16 +105,23 @@ export default class App extends Component {
 
   componentWillUnmount () {
     this.tracker.removeAllListeners();
+    document.addEventListener('keydown', this.captureOnKeyDown, false);
   }
 
   render () {
     return (
       <div className='container'>
-        <div className='cameraOutput'>
-          <video ref='cameraOutput' width='640' height='480' preload autoPlay loop muted />
-          <canvas ref='canvas' width='640' height='480' />
-        </div>
-        <button onClick={this.capture}>GIF it</button>
+        {
+          this.state.isGenerating
+            ? <Processing />
+            : (<div className='camera'>
+              <div className='cameraOutput'>
+                <video ref='cameraOutput' width='640' height='480' preload autoPlay loop muted />
+                <canvas ref='canvas' width='640' height='480' />
+              </div>
+              <button onClick={this.capture}>GIF it</button>
+            </div>)
+        }
       </div>
     );
   }
