@@ -29,8 +29,8 @@ const server = new Hapi.Server();
 module.exports.server = server;
 
 server.connection({
-  host: '0.0.0.0',    // seems necessary, rather than localhost, for Docker
-  port: 8888,         // must match exposed port in Dockerfile
+  host: '0.0.0.0',
+  port: 8888,
   routes: {
     cors: true
   }

@@ -35,7 +35,7 @@ const saveName = (name) => {
 const uploadFile = (name) => {
   const imageRef = bucket.child(name);
   return util.promisify(imageRef.put(name, metadata));
-}
+};
 
 const main = () => {
   const newName = `${uuid.v4()}.gif`;

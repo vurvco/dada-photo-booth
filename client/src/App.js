@@ -14,7 +14,7 @@ import threeGif from './img/3.gif';
 const placeholders = [
   oneGif,
   twoGif,
-  threeGif,
+  threeGif
 ];
 
 export class App extends React.Component {

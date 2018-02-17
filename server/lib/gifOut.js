@@ -13,7 +13,7 @@ const cleanUp = 'rm cropped.jpg';
 // h/t: https://stackoverflow.com/questions/20267939/nodejs-write-base64-image-file
 const decodeBase64Image = (data) => {
   const str = JSON.parse(data.toString());
-  const matches = str.image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+  const matches = str.image.match(/^data:([A-Za-z-+\\/]+);base64,(.+)$/);
   const response = {};
 
   if (matches.length !== 3) {
@@ -46,7 +46,5 @@ const main = (request, reply) => {
     })
     .catch(err => err);
 };
-
-// kick off postImg here
 
 module.exports.gifOut = main;
