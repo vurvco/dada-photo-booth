@@ -22,3 +22,25 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.cameraOutput {
+  margin-left: 25%;
+}
+
+.cameraOutput video {
+  position: absolute;
+}
+
+.cameraOutput canvas {
+  position: absolute;
+}
+
+.container {
+  position: relative;
+}
+
+button {
+  margin-left: 50%;
+  margin-top: 490px;
+  position: relative;
+}
