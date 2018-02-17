@@ -74,7 +74,7 @@ export const retrieve = () => {
 
       return dispatch({
         type: RETRIEVE,
-        urls: subset(urls, 4)
+        urls: subset(urls, 2)
       });
     });
   };

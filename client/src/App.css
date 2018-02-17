@@ -41,14 +41,14 @@ div.images div.newest img {
 
 div.images div.grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
 
 div.images div.grid div.image {
-  background-color: #0069b3;
+  background-color: #ffffff;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: left;
+  align-items: left;
 }
 
 div.images div.grid div.image img {

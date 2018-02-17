@@ -40,10 +40,6 @@ void draw() {
   int randx_offset = int(random(0,8));
   int randy_offset = int(random(0,8));
 
-  /*float randh = random(5,7) + random(3,7);
-  float randw = randh * random(4,8);
-  float rands = random(2,5);*/
-
   float randh = random(2,3) + random(2,6);
   float randw = randh * random(2,7);
   float rands = random(2,6);
@@ -56,7 +52,7 @@ void draw() {
   println(frameCount);
 
   if (frameCount > 1500 && frameCount < 3500) {
-    saveFrame("/Users/IceKing/Code/art/dadageek/processing-class/exhibit_00/artifacts/f#####.gif");
+    saveFrame("/Users/IceKing/Code/art/dada-photo-booth/server/artifacts/f#####.gif");
   }
 
   if (frameCount == 3500) {

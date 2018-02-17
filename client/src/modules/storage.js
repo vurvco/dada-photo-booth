@@ -19,11 +19,11 @@ firebase.initializeApp(config);
 export const filenameRef = firebase.database().ref('fall-event-2017/filenames');
 
 const storage = firebase.storage();
-const storageRef = storage.ref();
-const bucket = storageRef.child('fall-event-2017');
+const bucket = storage.ref();
 
 export const getImageUrls = async (filenames) => {
-  return Promise.all(await filenames.map(async (filename) => {
+  const names = Object.values(filenames);
+  return Promise.all(await names.map(async (filename) => {
     const url = await bucket.child(filename).getDownloadURL();
     return url;
   }));
