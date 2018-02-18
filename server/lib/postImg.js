@@ -34,6 +34,7 @@ const saveName = (name) => {
 
 const uploadFile = (name) => {
   const imageRef = bucket.child(name);
+  const metadata = { todo: '' };
   return util.promisify(imageRef.put(name, metadata));
 };
 
@@ -46,6 +47,8 @@ const main = () => {
     .then((res) => console.log(`Glitch image added to FB: ${res}`))
     .catch((err) => err);
 };
+
+module.exports.main = main;
 
 // todo: append filename to firebase database array at
 //       dada-photo-booth/fall-event-2017/filenames

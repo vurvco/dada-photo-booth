@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import AlertContainer from 'react-alert';
 import Webcam from 'react-webcam';
 import socket from 'socket.io-client';
 import { Rectangle } from 'react-shapes';
@@ -14,7 +13,7 @@ const socketOptions = {
 
 const client = socket.connect(serverUrl, socketOptions);
 
-const SPACEBAR_KEYCODE = '32';
+const SPACEBAR_KEYCODE = 32;
 
 // const postUrl = 'http://localhost:8888/camera_upload';
 
@@ -26,15 +25,7 @@ const SPACEBAR_KEYCODE = '32';
 //   }
 // });
 
-const alertOptions = {
-  offset: 14,
-  position: 'top right',
-  theme: 'dark',
-  time: 5000,
-  transition: 'scale'
-};
-
-const Processing = () => (<div><p>cool shit from adam!</p></div>);
+const Processing = () => (<div style={{color: 'white'}}><p>cool shit from adam!</p></div>);
 
 export default class App extends Component {
   constructor (props) {
@@ -43,38 +34,38 @@ export default class App extends Component {
     this.capture = this.capture.bind(this);
   }
 
-  showAlert (text, type) {
-    this.msg.show(text, {
-      type,
-      time: 3000
-    });
-  }
-
   capture (event) {
+    console.log('event', event);
+    console.log('this.state', this.state);
     if (event.keyCode === SPACEBAR_KEYCODE) {
       const imageSrc = this.refs.webcam.getScreenshot();
       console.log('imageSrc', imageSrc);
       this.setState({ isGenerating: true });
+      console.log('this.state', this.state);
+      setTimeout(() => {
+        this.setState({ isGenerating: false });
+      }, 2000);
       // window.fetch(postUrl, postOptions(imageSrc))
       //   .then(res => {
       //     console.log({ res });
       //     if (res.ok) {
-      //       this.showAlert('Photo Uploaded', 'success');
+      //       console.log('ok!');
       //     } else {
-      //       this.showAlert(`Upload Error: ${res.statusText}`, 'error');
+      //       console.log(`Upload Error: ${res.statusText}`);
       //     }
       //   })
       //   .catch(err => {
       //     console.error({ err });
-      //     this.showAlert(`Upload Error: ${err.message}`, 'error');
       //   });
     }
   }
 
   getFaces () {
     setInterval(() => {
-      const screenshot = this.refs.webcam.getScreenshot();
-      this.client.emit('image', {base64: screenshot.toString()});
+      if (this.refs.webcam) {
+        const screenshot = this.refs.webcam.getScreenshot();
+        this.client.emit('image', {base64: screenshot.toString()});
+      }
     }, 150);
   }
 
@@ -120,7 +111,6 @@ export default class App extends Component {
     const style = {position: 'static', top: 0, left: 0, 'minWidth': '100%'};
     return (
       <div className='container'>
-        <AlertContainer ref={a => { this.msg = a; }} {...alertOptions} />
         { this.state.isGenerating
         ? <Processing />
         : (<div>

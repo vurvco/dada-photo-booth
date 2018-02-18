@@ -2,14 +2,25 @@
   "name": "dada-photo-booth",
   "version": "1.0.0",
   "description": "Containerized version of the Dada Photo Booth",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": {
+    "dpb-server": "dist/index.js"
+  },
+  "files": [
+    "dist/"
+  ],
   "scripts": {
-    "build-image": "docker build -t dpb .",
+    "build": "babel --optional runtime src -d dist && cp ./node_modules/opencv/data/haarcascade_frontalface_alt.xml src/face.xml && cp ./node_modules/opencv/data/haarcascade_frontalface_alt.xml dist/face.xml",
+    "check": "npm run lint -s",
+    "clean": "rimraf dist",
     "dev": "chokidar '**/*.js' -c 'semistandard && ava'",
     "lint": "semistandard",
-    "run-image": "docker run -p 49160:8888 -d dpb",
+    "prebuild": "npm run check -s && npm run clean -s",
+    "prepublish": "npm run build -s",
+    "sample": "babel-node sample/index.js",
     "start": "node index.js",
-    "test": "NODE_ENV=test ava"
+    "test": "NODE_ENV=test ava",
+    "watch": "watch 'npm run build' src test"
   },
   "repository": {
     "type": "git",
@@ -23,14 +34,28 @@
   "homepage": "https://github.com/vurvco/dada-photo-booth#readme",
   "devDependencies": {
     "ava": "^0.22.0",
+    "babel-cli": "^6.6.0",
+    "babel-core": "^6.6.0",
+    "babel-eslint": "^5.0.0",
+    "babel-preset-es2015": "^6.6.0",
     "chokidar-cli": "^1.2.0",
-    "semistandard": "^11.0.0"
+    "coveralls": "^2.11.8",
+    "is-buffer": "^1.1.2",
+    "isparta": "^4.0.0",
+    "rimraf": "^2.5.2",
+    "semistandard": "^11.0.0",
+    "socket.io-client": "^1.4.5",
+    "watch": "^0.17.1"
   },
   "dependencies": {
+    "estraverse-fb": "^1.3.2",
     "good": "^7.3.0",
     "good-console": "^6.4.0",
     "good-squeeze": "^5.0.2",
     "hapi": "^16.5.2",
+    "opencv": "^5.0.0",
+    "request": "^2.69.0",
+    "socket.io": "^1.4.5",
     "uuid": "^3.1.0"
   }
 }
