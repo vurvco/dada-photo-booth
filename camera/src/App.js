@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import AlertContainer from 'react-alert';
+import Webcam from 'react-webcam';
+import socket from 'socket.io-client';
+import { Rectangle } from 'react-shapes';
 
-import './App.css';
+const serverUrl = 'http://localhost:3000';
 
-require('tracking');
-require('tracking/build/data/face');
+const socketOptions = {
+  transports: ['websocket'],
+  'force new connection': true
+};
+
+const client = socket.connect(serverUrl, socketOptions);
 
 const SPACEBAR_KEYCODE = '32';
 
-const postUrl = 'http://localhost:8888/camera_upload';
+// const postUrl = 'http://localhost:8888/camera_upload';
 
-const postOptions = src => ({
-  method: 'POST',
-  body: JSON.stringify({ image: src }),
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+// const postOptions = src => ({
+//   method: 'POST',
+//   body: JSON.stringify({ image: src }),
+//   headers: {
+//     'Content-Type': 'application/json'
+//   }
+// });
 
 const alertOptions = {
   offset: 14,
@@ -26,16 +34,13 @@ const alertOptions = {
   transition: 'scale'
 };
 
-// const Processing = () => (<div><p>cool shit from adam!</p></div>);
+const Processing = () => (<div><p>cool shit from adam!</p></div>);
 
 export default class App extends Component {
   constructor (props) {
     super(props);
     this.state = { isGenerating: false };
-    this.tracker = null;
     this.capture = this.capture.bind(this);
-    this.captureEvent = this.captureEvent.bind(this);
-    this.captureOnKeyDown = this.captureOnKeyDown.bind(this);
   }
 
   showAlert (text, type) {
@@ -45,95 +50,89 @@ export default class App extends Component {
     });
   }
 
-  captureOnKeyDown (event) {
-    if (event.keyCode.toString() === SPACEBAR_KEYCODE) {
-      // this.capture(event);
+  capture (event) {
+    if (event.keyCode === SPACEBAR_KEYCODE) {
+      const imageSrc = this.refs.webcam.getScreenshot();
+      console.log('imageSrc', imageSrc);
+      this.setState({ isGenerating: true });
+      // window.fetch(postUrl, postOptions(imageSrc))
+      //   .then(res => {
+      //     console.log({ res });
+      //     if (res.ok) {
+      //       this.showAlert('Photo Uploaded', 'success');
+      //     } else {
+      //       this.showAlert(`Upload Error: ${res.statusText}`, 'error');
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.error({ err });
+      //     this.showAlert(`Upload Error: ${err.message}`, 'error');
+      //   });
     }
   }
 
-  captureEvent (event) {
-    this.capture(event);
+  getFaces () {
+    setInterval(() => {
+      const screenshot = this.refs.webcam.getScreenshot();
+      this.client.emit('image', {base64: screenshot.toString()});
+    }, 150);
   }
 
-  // capture (event) {
-  //   /*
-  //     navigator.getUserMedia({video: true}, function(stream) {
-  //       video.src = window.URL.createObjectURL(stream);
-  //       localMediaStream = stream;
-  //     }, function(error){console.error(error)});
-  //   */
-  //   window.navigator.getUserMedia({video: true}, (stream) => {
-  //     document.querySelector('video').src = window.URL.createObjectURL(stream);
-  //     document.querySelector('a').href = this.refs.canvas.toDataURL('image/png');
-  //     window.fetch(postUrl, postOptions(this.refs.canvas.toDataURL('image/png')))
-  //       .then(res => {
-  //         if (res.ok) {
-  //           this.showAlert('Photo Uploaded', 'success');
-  //           this.setState({ isGenerating: true });
-  //         } else {
-  //           this.showAlert(`Upload Error: ${res.statusText}`, 'error');
-  //         }
-  //       })
-  //       .catch(err => {
-  //         console.error({ err });
-  //         this.showAlert(`Upload Error: ${err.message}`, 'error');
-  //       });
-  //   }, (error) => { console.error(`Err in gum cb: ${error}`); });
-  // }
+  addFaces (array) {
+    let el = ReactDOM.findDOMNode(this);
+    let container = el.querySelector('.faces');
+    const faces = (
+      <div>
+        {array.map(function (rect, i) {
+          const topRectangle = rect.y + 'px';
+          const leftRectangle = rect.x + 'px';
 
-  // componentDidMount () {
-  //   // Capture image with spacebar
-  //   document.addEventListener('keydown', this.captureOnKeyDown, false);
+          const styleRectangle = {position: 'fixed', top: topRectangle, left: leftRectangle, 'xIndex': 1};
+          return <div key={i} style={styleRectangle}>
+            <Rectangle width={rect.width}
+              height={rect.height}
+              fill={{color: '#2409ba', alpha: 4}}
+              stroke={{color: '#E65243'}}
+              strokeWidth={3} />
+          </div>;
+        })}
+      </div>);
 
-  //   this.tracker = new window.tracking.ObjectTracker('face');
-  //   this.tracker.setInitialScale(4);
-  //   this.tracker.setStepSize(2);
-  //   this.tracker.setEdgesDensity(0.1);
+    ReactDOM.render(faces, container);
+  }
 
-  //   window.tracking.track(this.refs.cameraOutput, this.tracker, { camera: true });
-  //   this.tracker.on('track', (event) => {
-  //     // Stop app from erroring when `<canvas>` gets hidden
-  //     if (this.refs.canvas) {
-  //       let context = this.refs.canvas.getContext('2d');
-  //       context.clearRect(0, 0, this.refs.canvas.width, this.refs.canvas.height);
+  componentDidMount () {
+    document.addEventListener('keydown', this.capture);
 
-  //       event.data.forEach((rect) => {
-  //         let { x, y, width, height } = rect;
-  //         y *= 0.9;
-  //         height *= 1.33;
+    client.on('connect', () => {
+      this.client = client;
+      this.client.on('faces', faces => {
+        this.addFaces(faces);
+      });
+    });
+  }
 
-  //         context.strokeStyle = '#a64ceb';
-  //         context.strokeRect(x, y, width, height);
-  //         context.lineWidth = 5;
-  //         context.font = '11px Helvetica';
-  //         context.fillStyle = '#fff';
-  //         context.fillText(`x: ${x}px`, x + width + 5, y + 11);
-  //         context.fillText(`y: ${y}px`, x + width + 5, y + 22);
-  //       });
-  //     }
-  //   });
-  // }
-
-  // componentWillUnmount () {
-  //   this.tracker.removeAllListeners();
-  //   document.addEventListener('keydown', this.captureOnKeyDown, false);
-  // }
+  componentWillUnmount () {
+    document.removeEventListener('keydown');
+  }
 
   render () {
+    const style = {position: 'static', top: 0, left: 0, 'minWidth': '100%'};
     return (
       <div className='container'>
-        {/* <AlertContainer ref={a => { this.msg = a; }} {...alertOptions} />
-        {
-          this.state.isGenerating
-            ? <Processing />
-            : (<div className='camera'>
-              <div className='cameraOutput'>
-                <video ref='cameraOutput' width='640' height='480' preload autoPlay loop muted />
-                <canvas ref='canvas' width='640' height='480' />
-              </div>
-              <a className='button' href='' download='snapshot.png' onClick={this.captureEvent}>GIF it</a>
-            </div>)
-        } */}
+        <AlertContainer ref={a => { this.msg = a; }} {...alertOptions} />
+        { this.state.isGenerating
+        ? <Processing />
+        : (<div>
+          <div className='faces' />
+          <div style={style}>
+            <Webcam screenshotFormat='image/jpeg'
+              ref='webcam'
+              audio={false}
+              onUserMedia={this.getFaces.bind(this)} />
+          </div>
+        </div>)
+      }
       </div>
     );
   }
