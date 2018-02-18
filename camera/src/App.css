@@ -39,8 +39,17 @@
   position: relative;
 }
 
-button {
+a.button {
   margin-left: 50%;
   margin-top: 490px;
   position: relative;
+  border: 1px solid cornflowerblue;
+  background-color: cornflowerblue;
+  color: whitesmoke;
+  border-radius: 3px;
+  padding: 7px;
+}
+
+a.button:hover {
+  cursor: pointer;
 }

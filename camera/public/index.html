@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.1.3/tracking-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.1.3/data/face-min.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
@@ -36,5 +38,51 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <a href="" download="snapshot.png">
+    <video id="video" class="face-video" width="740" height="560" preload autoplay loop muted></video>
+    <canvas id="canvas" class="face-canvas" width="740" height="560"></canvas>
+
+    <script>
+      var video = document.getElementById('video');
+      // const video = this.refs.video;
+      var canvas = document.getElementById('canvas');
+      // const canvas = this.refs.canvas;
+      var context = canvas.getContext('2d');
+      var tracker = new tracking.ObjectTracker('face');
+      var localMediaStream = null;
+
+      tracker.setInitialScale(6);
+      tracker.setStepSize(2);
+      tracker.setEdgesDensity(0.1);
+      tracking.track('#video', tracker, { camera: true });
+      // tracking.track(video, tracker, { camera: true });
+
+      tracker.on('track', function(event) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        event.data.forEach(function(rect) {
+          context.strokeStyle = '#ff0000';
+          context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+          context.font = '11px Helvetica';
+          context.fillStyle = "#fff";
+          context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+          context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+          context.drawImage(video, rect.x, rect.y, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+        });
+      });
+
+      var snapshot = function() {
+        if (localMediaStream) {
+          document.querySelector('a').href = canvas.toDataURL('image/png');
+        }
+      }
+
+      video.addEventListener('click', snapshot, false);
+
+      navigator.getUserMedia({video: true}, function(stream) {
+        video.src = window.URL.createObjectURL(stream);
+        localMediaStream = stream;
+      }, function(error){console.error(error)});
+
+    </script>
   </body>
 </html>
