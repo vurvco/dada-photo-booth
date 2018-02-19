@@ -13,50 +13,40 @@ const socketOptions = {
 
 const client = socket.connect(serverUrl, socketOptions);
 
+const H_KEYCODE = 72;
 const SPACEBAR_KEYCODE = 32;
 
-// const postUrl = 'http://localhost:8888/camera_upload';
+const subscribeToGlitch = (client, cb) => {
+  client.on('glitch_response', response => cb(null, response));
+};
 
-// const postOptions = src => ({
-//   method: 'POST',
-//   body: JSON.stringify({ image: src }),
-//   headers: {
-//     'Content-Type': 'application/json'
-//   }
-// });
-
-const Processing = () => (<div style={{color: 'white'}}><p>cool shit from adam!</p></div>);
+const Processing = ({ res }) => (<div style={{color: 'white'}}>
+  {res ? <p>!!!!!!cool shit from adam!!!!!!</p> : <p>d'oh!</p>}
+</div>);
 
 export default class App extends Component {
   constructor (props) {
     super(props);
-    this.state = { isGenerating: false };
+    this.state = {
+      isGenerating: false,
+      glitchRes: false
+    };
     this.capture = this.capture.bind(this);
   }
 
   capture (event) {
-    console.log('event', event);
-    console.log('this.state', this.state);
+    if (event.keyCode === H_KEYCODE) {
+      this.client.emit('health');
+    }
+
     if (event.keyCode === SPACEBAR_KEYCODE) {
       const imageSrc = this.refs.webcam.getScreenshot();
-      console.log('imageSrc', imageSrc);
+      this.client.emit('camera_upload', imageSrc);
       this.setState({ isGenerating: true });
-      console.log('this.state', this.state);
+
       setTimeout(() => {
         this.setState({ isGenerating: false });
       }, 2000);
-      // window.fetch(postUrl, postOptions(imageSrc))
-      //   .then(res => {
-      //     console.log({ res });
-      //     if (res.ok) {
-      //       console.log('ok!');
-      //     } else {
-      //       console.log(`Upload Error: ${res.statusText}`);
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.error({ err });
-      //   });
     }
   }
 
@@ -64,7 +54,9 @@ export default class App extends Component {
     setInterval(() => {
       if (this.refs.webcam) {
         const screenshot = this.refs.webcam.getScreenshot();
-        this.client.emit('image', {base64: screenshot.toString()});
+        if (screenshot) {
+          this.client.emit('image', {base64: screenshot.toString()});
+        }
       }
     }, 150);
   }
@@ -100,6 +92,13 @@ export default class App extends Component {
       this.client.on('faces', faces => {
         this.addFaces(faces);
       });
+      // this.client.on('glitch_response', ({ response }) => {
+      //   this.setState({ glitchRes: response });
+      // });
+      subscribeToGlitch(this.client, (err, response) => {
+        console.log('response in subscribe', response);
+        !err && this.setState({ glitchRes: response });
+      });
     });
   }
 
@@ -112,7 +111,7 @@ export default class App extends Component {
     return (
       <div className='container'>
         { this.state.isGenerating
-        ? <Processing />
+        ? <Processing res={this.state.glitchRes} />
         : (<div>
           <div className='faces' />
           <div style={style}>

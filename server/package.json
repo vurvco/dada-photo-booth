@@ -18,7 +18,7 @@
     "prebuild": "npm run check -s && npm run clean -s",
     "prepublish": "npm run build -s",
     "sample": "babel-node sample/index.js",
-    "start": "node index.js",
+    "start": "npm run build && node dist/index.js",
     "test": "NODE_ENV=test ava",
     "watch": "watch 'npm run build' src test"
   },
