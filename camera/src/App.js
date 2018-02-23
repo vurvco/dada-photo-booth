@@ -41,6 +41,8 @@ export default class App extends Component {
 
     if (event.keyCode === SPACEBAR_KEYCODE) {
       const imageSrc = this.refs.webcam.getScreenshot();
+      // todo: pass in the rect dimensions here
+      // todo: crop photo to dimensions on server side
       this.client.emit('camera_upload', imageSrc);
       this.setState({ isGenerating: true });
 
@@ -91,13 +93,6 @@ export default class App extends Component {
       this.client = client;
       this.client.on('faces', faces => {
         this.addFaces(faces);
-      });
-      // this.client.on('glitch_response', ({ response }) => {
-      //   this.setState({ glitchRes: response });
-      // });
-      subscribeToGlitch(this.client, (err, response) => {
-        console.log('response in subscribe', response);
-        !err && this.setState({ glitchRes: response });
       });
     });
   }
