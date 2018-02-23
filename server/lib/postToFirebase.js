@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 const util = require('util');
 const uuid = require('uuid');
 const exec = util.promisify(require('child_process').exec);
