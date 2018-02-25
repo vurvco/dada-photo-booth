@@ -5,3 +5,4 @@ server/artifacts/*.gif
 server/output/
 server/tmp/
 
+firebase-admin-key.json
