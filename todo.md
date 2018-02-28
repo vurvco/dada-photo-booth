@@ -17,11 +17,11 @@
 
 ## SERVER
 - [x] server that accepts images POSTed to /camera_upload
-- [ ] set twitter process.env variables -- see snag for ideas
+- [x] set twitter process.env variables -- see snag for ideas
 - [ ] mechanism for kicking off...
   - [ ] ~~Processing~~ p5 sketch
   - [ ] ~~gifsicle~~ Node.js wrapper for gifsicle
-  - [ ] POSTing images to Twitter
+  - [x] POSTing images to Twitter
     - [ ] ~~@mention the uploader~~
-  - [ ] POSTing images to Firebase
+  - [x] POSTing images to Firebase
   - [ ] file cleanup
