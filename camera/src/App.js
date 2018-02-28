@@ -16,9 +16,9 @@ const client = socket.connect(serverUrl, socketOptions);
 const H_KEYCODE = 72;
 const SPACEBAR_KEYCODE = 32;
 
-const subscribeToGlitch = (client, cb) => {
-  client.on('glitch_response', response => cb(null, response));
-};
+// const subscribeToGlitch = (client, cb) => {
+//   client.on('glitch_response', response => cb(null, response));
+// };
 
 const Processing = ({ res }) => (<div style={{color: 'white'}}>
   {res ? <p>!!!!!!cool shit from adam!!!!!!</p> : <p>d'oh!</p>}
@@ -36,13 +36,12 @@ export default class App extends Component {
 
   capture (event) {
     if (event.keyCode === H_KEYCODE) {
+      console.log('Health request registered. Check output in server terminal.');
       this.client.emit('health');
     }
 
     if (event.keyCode === SPACEBAR_KEYCODE) {
       const imageSrc = this.refs.webcam.getScreenshot();
-      // todo: pass in the rect dimensions here
-      // todo: crop photo to dimensions on server side
       this.client.emit('camera_upload', imageSrc);
       this.setState({ isGenerating: true });
 
@@ -64,15 +63,27 @@ export default class App extends Component {
   }
 
   addFaces (array) {
-    let el = ReactDOM.findDOMNode(this);
-    let container = el.querySelector('.faces');
+    const client = this.client;
+    const isGenerating = this.state.isGenerating;
+    const el = ReactDOM.findDOMNode(this);
+    const container = el.querySelector('.faces');
     const faces = (
       <div>
         {array.map(function (rect, i) {
-          const topRectangle = rect.y + 'px';
-          const leftRectangle = rect.x + 'px';
+          const topRectangle = `${rect.y}px`;
+          const leftRectangle = `${rect.x}px`;
+          const styleRectangle = {
+            position: 'fixed',
+            top: topRectangle,
+            left: leftRectangle,
+            'xIndex': 1
+          };
 
-          const styleRectangle = {position: 'fixed', top: topRectangle, left: leftRectangle, 'xIndex': 1};
+          if (!isGenerating) {
+            client.emit('coordinates', rect);
+            console.log(JSON.stringify(rect));
+          }
+
           return <div key={i} style={styleRectangle}>
             <Rectangle width={rect.width}
               height={rect.height}

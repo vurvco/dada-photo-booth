@@ -20,7 +20,7 @@
     "sample": "babel-node sample/index.js",
     "start": "npm run build && node dist/index.js",
     "test": "NODE_ENV=test ava",
-    "watch": "watch 'npm run build' src test"
+    "watch": "watch 'npm run build' src tests"
   },
   "repository": {
     "type": "git",

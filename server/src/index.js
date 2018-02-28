@@ -23,6 +23,11 @@ function detectFace (image) {
 
 io.on('connection', (socket) => {
   console.log(`client ID: ${socket.client.id}`);
+  let x;
+  let y;
+  let width;
+  let height;
+
   socket.on('image', (data) => {
     const image = new Image(data);
     image.build().then((imgBuffer) => {
@@ -41,8 +46,17 @@ io.on('connection', (socket) => {
     console.log('200: they live!');
   });
 
-  socket.on('camera_upload', (data) => {
-    gifOut(data)
+  socket.on('coordinates', (dimensions) => {
+    x = dimensions.x;
+    y = dimensions.y;
+    width = dimensions.width;
+    height = dimensions.height;
+  });
+
+  socket.on('camera_upload', (imageSrc) => {
+    // first, crop according to dimensions,
+    // then pass that into `gifOut`.
+    gifOut(imageSrc)
       .then((res) => {
         console.log('res', res);
         socket.emit('gif_response', { response: true });
