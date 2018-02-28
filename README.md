@@ -13,10 +13,13 @@ Includes [server](./server) for processing and sending off photos.
 ## Running
 _Ensure you have node.js and npm installed_
 
-- Run `npm install && npm start` in the `camera` directory. Navigate to [localhost:3000](localhost:3000) in your browser.
-- Run `npm install && npm start` in the `client` directory. Navigate to [localhost:3000](localhost:3001) in your browser, if the script does not take you there directly.
-- Run `npm install && npm start` in the `server` directory. Server will be running at [0.0.0.0:8888](0.0.0.0:8888)&mdash;check on it at [0.0.0.0:8888/health](0.0.0.0:8888/health).
+- Run `npm install && npm start` in the `camera` directory. An Electron application will open.
+- Run `npm install && npm start` in the `client` directory. Navigate to [localhost:3001](localhost:3001) in your browser, if the script does not take you there directly.
+- Run `npm install && npm start` in the `server` directory. The socket will be running at [0.0.0.0:3000](0.0.0.0:3000)&mdash;check on the health by pressing the `h` key in the Electron app and check on the output in the server console.
 
 ## Development
 
 - `npm install` in `camera`, `client`, and `server`.
+- `npm start` in `server`
+- `npm run watch` in `camera` before...
+- `npm start` in `camera`

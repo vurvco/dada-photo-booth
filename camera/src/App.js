@@ -1,94 +1,134 @@
 import React, { Component } from 'react';
-import AlertContainer from 'react-alert';
+import ReactDOM from 'react-dom';
 import Webcam from 'react-webcam';
+import socket from 'socket.io-client';
+import { Rectangle } from 'react-shapes';
 
-import './App.css';
+const serverUrl = 'http://localhost:3000';
 
-// For RequestBin
-// const postUrl = 'http://cors-anywhere.herokuapp.com/https://requestb.in/r2gkeyr2';
-// For Docker
-// const postUrl = 'http://localhost:49160/camera_upload';
-// For Node
-const postUrl = 'http://localhost:8888/camera_upload';
-// todo: add `/camera_upload` to postUrl
-
-const postOptions = src => ({
-  method: 'POST',
-  body: JSON.stringify({ image: src }),
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-const alertOptions = {
-  offset: 14,
-  position: 'top right',
-  theme: 'dark',
-  time: 5000,
-  transition: 'scale'
+const socketOptions = {
+  transports: ['websocket'],
+  'force new connection': true
 };
 
+const client = socket.connect(serverUrl, socketOptions);
 
-const Processing = () => (<div>Adam's cool shit!</div>);
+const H_KEYCODE = 72;
+const SPACEBAR_KEYCODE = 32;
 
-const Camera = ({ setRef, capture }) => (
-  <div className="camera">
-    <Webcam
-      audio={false}
-      height={window.innerHeight}
-      ref={setRef}
-      screenshotFormat='image/jpeg'
-      width={window.innerWidth}
-    />
-    <button onClick={capture}>GIF it</button>
-  </div>
-);
+// const subscribeToGlitch = (client, cb) => {
+//   client.on('glitch_response', response => cb(null, response));
+// };
 
-class App extends Component {
-  constructor(props) {
+const Processing = ({ res }) => (<div style={{color: 'white'}}>
+  {res ? <p>!!!!!!cool shit from adam!!!!!!</p> : <p>d'oh!</p>}
+</div>);
+
+export default class App extends Component {
+  constructor (props) {
     super(props);
-    this.state = {isGenerating: false};
+    this.state = {
+      isGenerating: false,
+      glitchRes: false
+    };
+    this.capture = this.capture.bind(this);
   }
 
-  setRef = (webcam) => {
-    this.webcam = webcam;
+  capture (event) {
+    if (event.keyCode === H_KEYCODE) {
+      console.log('Health request registered. Check output in server terminal.');
+      this.client.emit('health');
+    }
+
+    if (event.keyCode === SPACEBAR_KEYCODE) {
+      const imageSrc = this.refs.webcam.getScreenshot();
+      this.client.emit('camera_upload', imageSrc);
+      this.setState({ isGenerating: true });
+
+      setTimeout(() => {
+        this.setState({ isGenerating: false });
+      }, 2000);
+    }
   }
 
-  showAlert = (text, type) => {
-    this.msg.show(text, {
-      type,
-      time: 3000
-    });
-  };
-
-  capture = () => {
-    const imageSrc = this.webcam.getScreenshot();
-    window.fetch(postUrl, postOptions(imageSrc))
-      .then(res => {
-        console.log({ res });
-        if (res.ok) {
-          this.showAlert('Photo Uploaded', 'success');
-          this.setState({ isGenerating: true });
-        } else {
-          this.showAlert(`Upload Error: ${res.statusText}`, 'error');
+  getFaces () {
+    setInterval(() => {
+      if (this.refs.webcam) {
+        const screenshot = this.refs.webcam.getScreenshot();
+        if (screenshot) {
+          this.client.emit('image', {base64: screenshot.toString()});
         }
-      })
-      .catch(err => {
-        console.error({ err });
-        this.showAlert(`Upload Error: ${err.message}`, 'error');
+      }
+    }, 150);
+  }
+
+  addFaces (array) {
+    const client = this.client;
+    const isGenerating = this.state.isGenerating;
+    const el = ReactDOM.findDOMNode(this);
+    const container = el.querySelector('.faces');
+    const faces = (
+      <div>
+        {array.map(function (rect, i) {
+          const topRectangle = `${rect.y}px`;
+          const leftRectangle = `${rect.x}px`;
+          const styleRectangle = {
+            position: 'fixed',
+            top: topRectangle,
+            left: leftRectangle,
+            'xIndex': 1
+          };
+
+          if (!isGenerating) {
+            client.emit('coordinates', rect);
+            console.log(JSON.stringify(rect));
+          }
+
+          return <div key={i} style={styleRectangle}>
+            <Rectangle width={rect.width}
+              height={rect.height}
+              fill={{color: '#2409ba', alpha: 4}}
+              stroke={{color: '#E65243'}}
+              strokeWidth={3} />
+          </div>;
+        })}
+      </div>);
+
+    ReactDOM.render(faces, container);
+  }
+
+  componentDidMount () {
+    document.addEventListener('keydown', this.capture);
+
+    client.on('connect', () => {
+      this.client = client;
+      this.client.on('faces', faces => {
+        this.addFaces(faces);
       });
+    });
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('keydown');
   }
 
   render () {
+    const style = {position: 'static', top: 0, left: 0, 'minWidth': '100%'};
     return (
-      <div className='App'>
-        <AlertContainer ref={a => { this.msg = a; }} {...alertOptions} />
-        {this.state.isGenerating
-          ? <Processing />
-          : <Camera setRef={this.setRef} capture={this.capture} />}
+      <div className='container'>
+        { this.state.isGenerating
+        ? <Processing res={this.state.glitchRes} />
+        : (<div>
+          <div className='faces' />
+          <div style={style}>
+            <Webcam screenshotFormat='image/jpeg'
+              ref='webcam'
+              audio={false}
+              onUserMedia={this.getFaces.bind(this)} />
+          </div>
+        </div>)
+      }
       </div>
     );
   }
 }
-
-export default App;

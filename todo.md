@@ -4,7 +4,7 @@
 - [x] app to take photos
   - [x] POST photos to /camera_upload
 - [ ] show procedural output of p5 sketch
-- [ ] draw rectangle or other tracking image over face in camera view
+- [ ] draw rectangle or other tracking image over face in camera view ([#6](https://github.com/vurvco/dada-photo-booth/issues/6))
 
 ## CLIENT
 - [x] copy over brandy-bunch-frontend
