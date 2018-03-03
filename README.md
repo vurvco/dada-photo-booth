@@ -11,7 +11,7 @@ Includes [camera app](./camera) for sending photos to be glitched.
 Includes [server](./server) for processing and sending off photos.
 
 ## Running
-_Ensure you have node.js and npm installed_
+_Ensure you have node.js and npm installed, as well as ImageMagick and maybe OpenCV?_
 
 - Run `npm install && npm start` in the `camera` directory. An Electron application will open.
 - Run `npm install && npm start` in the `client` directory. Navigate to [localhost:3001](localhost:3001) in your browser, if the script does not take you there directly.

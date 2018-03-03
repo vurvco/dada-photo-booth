@@ -2,9 +2,11 @@
 
 import Io from 'socket.io';
 import Opencv from 'opencv';
+import { crop } from 'easyimage';
 
 import Image from './models/image';
-import { gifOut } from '../lib/gifOut';
+import saveImageFromCamera from '../lib/saveImage';
+// import gifOut from '../lib/gifOut';
 
 const io = Io();
 
@@ -28,6 +30,10 @@ io.on('connection', (socket) => {
   let width;
   let height;
 
+  socket.on('health', () => {
+    console.log('200: they live!');
+  });
+
   socket.on('image', (data) => {
     const image = new Image(data);
     image.build().then((imgBuffer) => {
@@ -36,14 +42,12 @@ io.on('connection', (socket) => {
           console.log(err);
         }
         detectFace(imgMatrix).then((faces) => {
-          socket.emit('faces', faces);
+          socket.emit('faces', faces.map(({ x, y, width, height }) => {
+            return { x, y: y - 40, width, height: height + 50 };
+          }));
         }).catch(e => console.log(e));
       });
     });
-  });
-
-  socket.on('health', () => {
-    console.log('200: they live!');
   });
 
   socket.on('coordinates', (dimensions) => {
@@ -53,13 +57,26 @@ io.on('connection', (socket) => {
     height = dimensions.height;
   });
 
-  socket.on('camera_upload', (imageSrc) => {
-    // first, crop according to dimensions,
-    // then pass that into `gifOut`.
-    gifOut(imageSrc)
-      .then((res) => {
-        console.log('res', res);
-        socket.emit('gif_response', { response: true });
+  socket.on('camera_upload', (payload) => {
+    console.log('~~~Payload received.\n');
+
+    const src = './cropped.jpg';
+    const dst = './croppedByServer.jpg';
+
+    saveImageFromCamera(payload)
+      .then(() => {
+        console.log('~~~File written.\n');
+        crop({ src, dst, x, y, cropHeight: height, cropWidth: width })
+          .then((returned) => {
+            console.log({ x, y, width, height });
+            console.log(`returned: ${JSON.stringify(returned, null, 2)}\n`);
+            socket.emit('generating', { isGenerating: true });
+
+            // placeholder that will be replaced with p5 sketch process
+            setTimeout(() => {
+              socket.emit('generating', { isGenerating: false });
+            }, 3000);
+          });
       })
       .catch((err) => {
         console.log('err', err);

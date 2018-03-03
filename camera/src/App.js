@@ -16,10 +16,6 @@ const client = socket.connect(serverUrl, socketOptions);
 const H_KEYCODE = 72;
 const SPACEBAR_KEYCODE = 32;
 
-// const subscribeToGlitch = (client, cb) => {
-//   client.on('glitch_response', response => cb(null, response));
-// };
-
 const Processing = ({ res }) => (<div style={{color: 'white'}}>
   {res ? <p>!!!!!!cool shit from adam!!!!!!</p> : <p>d'oh!</p>}
 </div>);
@@ -27,10 +23,7 @@ const Processing = ({ res }) => (<div style={{color: 'white'}}>
 export default class App extends Component {
   constructor (props) {
     super(props);
-    this.state = {
-      isGenerating: false,
-      glitchRes: false
-    };
+    this.state = { isGenerating: false };
     this.capture = this.capture.bind(this);
   }
 
@@ -79,10 +72,7 @@ export default class App extends Component {
             'xIndex': 1
           };
 
-          if (!isGenerating) {
-            client.emit('coordinates', rect);
-            console.log(JSON.stringify(rect));
-          }
+          if (!isGenerating) client.emit('coordinates', rect);
 
           return <div key={i} style={styleRectangle}>
             <Rectangle width={rect.width}
@@ -94,7 +84,7 @@ export default class App extends Component {
         })}
       </div>);
 
-    ReactDOM.render(faces, container);
+    if (!this.state.isGenerating) ReactDOM.render(faces, container);
   }
 
   componentDidMount () {
@@ -102,6 +92,11 @@ export default class App extends Component {
 
     client.on('connect', () => {
       this.client = client;
+
+      this.client.on('generating', ({ isGenerating }) => {
+        this.setState({ isGenerating });
+      });
+
       this.client.on('faces', faces => {
         this.addFaces(faces);
       });
@@ -117,7 +112,7 @@ export default class App extends Component {
     return (
       <div className='container'>
         { this.state.isGenerating
-        ? <Processing res={this.state.glitchRes} />
+        ? <Processing res={this.state.isGenerating} />
         : (<div>
           <div className='faces' />
           <div style={style}>
