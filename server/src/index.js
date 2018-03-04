@@ -71,11 +71,6 @@ io.on('connection', (socket) => {
             console.log({ x, y, width, height });
             console.log(`returned: ${JSON.stringify(returned, null, 2)}\n`);
             socket.emit('generating', { isGenerating: true });
-
-            // placeholder that will be replaced with p5 sketch process
-            setTimeout(() => {
-              socket.emit('generating', { isGenerating: false });
-            }, 3000);
           });
       })
       .catch((err) => {

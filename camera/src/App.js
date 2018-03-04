@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import P5Wrapper from 'react-p5-wrapper';
 import Webcam from 'react-webcam';
 import socket from 'socket.io-client';
 import { Rectangle } from 'react-shapes';
+
+import sketch from './sketch';
 
 const serverUrl = 'http://localhost:3000';
 
@@ -23,7 +26,10 @@ const Processing = ({ res }) => (<div style={{color: 'white'}}>
 export default class App extends Component {
   constructor (props) {
     super(props);
-    this.state = { isGenerating: false };
+    this.state = {
+      sketch,
+      isGenerating: false
+    };
     this.capture = this.capture.bind(this);
   }
 
@@ -37,10 +43,6 @@ export default class App extends Component {
       const imageSrc = this.refs.webcam.getScreenshot();
       this.client.emit('camera_upload', imageSrc);
       this.setState({ isGenerating: true });
-
-      setTimeout(() => {
-        this.setState({ isGenerating: false });
-      }, 2000);
     }
   }
 
@@ -49,7 +51,9 @@ export default class App extends Component {
       if (this.refs.webcam) {
         const screenshot = this.refs.webcam.getScreenshot();
         if (screenshot) {
-          this.client.emit('image', {base64: screenshot.toString()});
+          this.client.emit('image', {
+            base64: screenshot.toString()
+          });
         }
       }
     }, 150);
@@ -65,7 +69,7 @@ export default class App extends Component {
         {array.map(function (rect, i) {
           const topRectangle = `${rect.y}px`;
           const leftRectangle = `${rect.x}px`;
-          const styleRectangle = {
+          const styleRect = {
             position: 'fixed',
             top: topRectangle,
             left: leftRectangle,
@@ -74,7 +78,7 @@ export default class App extends Component {
 
           if (!isGenerating) client.emit('coordinates', rect);
 
-          return <div key={i} style={styleRectangle}>
+          return <div key={i} style={styleRect}>
             <Rectangle width={rect.width}
               height={rect.height}
               fill={{color: '#2409ba', alpha: 4}}
@@ -112,7 +116,7 @@ export default class App extends Component {
     return (
       <div className='container'>
         { this.state.isGenerating
-        ? <Processing res={this.state.isGenerating} />
+        ? <P5Wrapper sketch={this.state.sketch} />
         : (<div>
           <div className='faces' />
           <div style={style}>
