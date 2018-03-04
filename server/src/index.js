@@ -5,7 +5,7 @@ import Opencv from 'opencv';
 import { crop } from 'easyimage';
 
 import Image from './models/image';
-import saveImageFromCamera from '../lib/saveImage';
+import saveImage from '../lib/saveImage';
 // import gifOut from '../lib/gifOut';
 
 const io = Io();
@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
     const src = './cropped.jpg';
     const dst = './croppedByServer.jpg';
 
-    saveImageFromCamera(payload)
+    saveImage(payload, 'cropped.jpg')
       .then(() => {
         console.log('~~~File written.\n');
         crop({ src, dst, x, y, cropHeight: height, cropWidth: width })
@@ -81,6 +81,18 @@ io.on('connection', (socket) => {
       .catch((err) => {
         console.log('err', err);
         socket.emit('gif_response', { response: false });
+      });
+  });
+
+  socket.on('save_gif', (blob) => {
+    saveImage(blob, 'glitch.gif')
+      .then(() => {
+        console.log('~~~Image saved.\n');
+        socket.emit('saved_gif_response', 'ok');
+      })
+      .catch(err => {
+        console.log(`err: ${err}\n`);
+        socket.emit('saved_gif_response', 'not ok');
       });
   });
 });
