@@ -20,7 +20,6 @@ const app = admin.initializeApp({
 });
 
 // Utils
-const newName = `${uuid.v4()}.gif`;
 const saveLocallyAs = (name) => `cp glitch.gif ${name}`;
 
 // File Upload
@@ -28,27 +27,23 @@ const storage = app.storage();
 const bucket = storage.bucket();
 
 const uploadFile = (name) => {
-  const options = { destination: `${BUCKET_NAME}/${name}.gif` };
+  const options = { destination: `${BUCKET_NAME}/${name}` };
   console.log(`options in uploadFile: ${JSON.stringify(options)}`);
   return bucket.upload(`glitch.gif`, options);
 };
 
 // Save Filenames
-const filenameRef = app.database().ref('2018-hello-world/filenames');
+const filenameRef = app.database().ref('2018_hello_world/filenames');
 const saveFilenameToDatabase = (name) => {
   console.log(`saveFilenameToDatabase: ${name}`);
   return filenameRef.push(name);
 };
 
 const main = () => {
+  const newName = `${uuid.v4()}.gif`;
   return exec(saveLocallyAs(newName))
     .then(() => uploadFile(newName))
-    .then(() => saveFilenameToDatabase(newName))
-    .then((res) => console.log(`Glitch image added to Firebase: ${res}`))
-    .catch((err) => {
-      console.log(`Err: ${JSON.stringify(err)}`);
-      throw err;
-    });
+    .then(() => saveFilenameToDatabase(newName));
 };
 
-module.exports.main = main;
+module.exports = main;

@@ -5,8 +5,10 @@ import Opencv from 'opencv';
 import { crop } from 'easyimage';
 
 import Image from './models/image';
+import copyImage from '../lib/copyImage';
 import saveImage from '../lib/saveImage';
-// import gifOut from '../lib/gifOut';
+import postToFirebase from '../lib/postToFirebase';
+import postToTwitter from '../lib/postToTwitter';
 
 const io = Io();
 
@@ -62,6 +64,9 @@ io.on('connection', (socket) => {
 
     const src = './cropped.jpg';
     const dst = './croppedByServer.jpg';
+    const dir = '../camera/public';
+
+    socket.emit('is_loading', true);
 
     saveImage(payload, 'cropped.jpg')
       .then(() => {
@@ -70,24 +75,39 @@ io.on('connection', (socket) => {
           .then((returned) => {
             console.log({ x, y, width, height });
             console.log(`returned: ${JSON.stringify(returned, null, 2)}\n`);
-            socket.emit('generating', { isGenerating: true });
-          });
+          })
+          .then(() => copyImage(dir))
+          .then(() => {
+            socket.emit('is_loading', false);
+            socket.emit('generating', true);
+          })
+          .catch(err => console.error(err));
       })
       .catch((err) => {
         console.log('err', err);
-        socket.emit('gif_response', { response: false });
+        socket.emit('generating', false);
       });
   });
 
   socket.on('save_gif', (blob) => {
+    console.log('~~~Blob received.');
     saveImage(blob, 'glitch.gif')
-      .then(() => {
-        console.log('~~~Image saved.\n');
-        socket.emit('saved_gif_response', 'ok');
+      // this console.log is logged to server console...
+      .then(() => console.log('~~~Gif saved.\n'))
+      .then(() => postToFirebase())
+      .then((res) => {
+        console.log(`Glitch image added to Firebase: ${res}`);
+        return postToTwitter();
       })
-      .catch(err => {
+      .then((tweet) => {
+        console.log(`Tweet: ${tweet}`);
+        // ...but this doesn't seem to work on Electron app
+        // todo: :point_down: this needs to get picked up by Electron app
+        socket.emit('generating', false);
+      })
+      .catch((err) => {
         console.log(`err: ${err}\n`);
-        socket.emit('saved_gif_response', 'not ok');
+        socket.emit('generating', false);
       });
   });
 });

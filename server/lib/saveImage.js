@@ -22,7 +22,7 @@ const saveImage = (payload, filename) => {
   const imageBuffer = Buffer.isBuffer(payload)
     ? decodeBuffer(payload)
     : decodeBase64Image(payload);
-  console.log('~~~Writing file.\n');
+  console.log(`~~~Writing ${filename}.\n`);
   return writeFile(filename, imageBuffer);
 };
 
