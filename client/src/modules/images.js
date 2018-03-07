@@ -52,7 +52,7 @@ export default (state = initialState, action) => {
 export const retrieve = () => {
   return async (dispatch, getState, getFirebase) => {
     const firebase = getFirebase();
-    const filenameRef = firebase.database().ref('fall-event-2017/filenames');
+    const filenameRef = firebase.database().ref('2018_hello_world/filenames');
 
     dispatch({
       type: FILENAMES_REQUESTED

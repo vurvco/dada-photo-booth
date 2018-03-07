@@ -16,10 +16,10 @@ const config = {
 };
 firebase.initializeApp(config);
 
-export const filenameRef = firebase.database().ref('fall-event-2017/filenames');
+export const filenameRef = firebase.database().ref('2018_hello_world/filenames');
 
 const storage = firebase.storage();
-const bucket = storage.ref();
+const bucket = storage.ref('2018_hello_world');
 
 export const getImageUrls = async (filenames) => {
   const names = Object.values(filenames);
