@@ -19,16 +19,15 @@ const client = socket.connect(serverUrl, socketOptions);
 const H_KEYCODE = 72;
 const SPACEBAR_KEYCODE = 32;
 
-const Processing = ({ res }) => (<div style={{color: 'white'}}>
-  {res ? <p>!!!!!!cool shit from adam!!!!!!</p> : <p>d'oh!</p>}
-</div>);
+const Loading = ({ style }) => <div style={style}>it loading</div>;
 
 export default class App extends Component {
   constructor (props) {
     super(props);
     this.state = {
       sketch,
-      isGenerating: false
+      isGenerating: false,
+      isLoading: false
     };
     this.capture = this.capture.bind(this);
   }
@@ -42,7 +41,6 @@ export default class App extends Component {
     if (event.keyCode === SPACEBAR_KEYCODE) {
       const imageSrc = this.refs.webcam.getScreenshot();
       this.client.emit('camera_upload', imageSrc);
-      this.setState({ isGenerating: true });
     }
   }
 
@@ -97,12 +95,22 @@ export default class App extends Component {
     client.on('connect', () => {
       this.client = client;
 
-      this.client.on('generating', ({ isGenerating }) => {
-        this.setState({ isGenerating });
+      this.client.on('faces', (faces) => {
+        this.addFaces(faces);
       });
 
-      this.client.on('faces', faces => {
-        this.addFaces(faces);
+      this.client.on('is_loading', (data) => {
+        this.setState({
+          isLoading: data
+        });
+      });
+
+      this.client.on('generating', (data) => {
+        console.log('data', data);
+        this.setState({
+          isGenerating: data,
+          isLoading: false
+        });
       });
     });
   }
@@ -112,20 +120,22 @@ export default class App extends Component {
   }
 
   render () {
-    const style = {position: 'static', top: 0, left: 0, 'minWidth': '100%'};
+    const style = {position: 'static', top: 0, left: 0, minWidth: '100%'};
     return (
       <div className='container'>
-        { this.state.isGenerating
-        ? <P5Wrapper sketch={this.state.sketch} />
-        : (<div>
-          <div className='faces' />
-          <div style={style}>
-            <Webcam screenshotFormat='image/jpeg'
-              ref='webcam'
-              audio={false}
-              onUserMedia={this.getFaces.bind(this)} />
-          </div>
-        </div>)
+        { this.state.isLoading
+        ? <Loading style={{color: 'white'}} />
+        : (this.state.isGenerating
+          ? <P5Wrapper sketch={this.state.sketch} />
+          : (<div>
+            <div className='faces' />
+            <div style={style}>
+              <Webcam screenshotFormat='image/jpeg'
+                ref='webcam'
+                audio={false}
+                onUserMedia={this.getFaces.bind(this)} />
+            </div>
+          </div>))
       }
       </div>
     );

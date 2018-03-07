@@ -4,7 +4,7 @@ import 'p5/lib/addons/p5.dom';
 let capture;
 let gif;
 let img;
-const imgFileName = 'vera';
+const imgFileName = 'croppedByServer';
 const fileType = 'jpg';
 
 const START_FRAME = 15;
@@ -21,15 +21,16 @@ const socket = io(serverUrl, socketOptions);
 function setupGif () {
   // eslint-disable-next-line no-undef
   gif = new GIF({
+    // todo: how many workers?
+    // todo: will changing quality speed it up?
     workers: 2,
     quality: 40
   });
 
   gif.on('finished', (blob) => {
-    console.log('~~~downloading...');
+    console.log('~~~Downloading.');
     // Blob is sent to server, where it is saved as a gif
     socket.emit('save_gif', blob);
-    socket.on('saved_gif_response', (res) => console.log(res)); // 'ok' or 'not ok'
     setupGif();
   });
 }
@@ -42,8 +43,6 @@ export default function sketch (p) {
 
   p.setup = () => {
     p.createCanvas(img.width, img.height);
-    // const canvas = p.createCanvas(img.width, img.height);
-    // canvas.parent('p5canvas');
 
     // todo: tweak these settings
     capture = p.createCapture(p.VIDEO);
@@ -89,7 +88,7 @@ export default function sketch (p) {
     }
 
     if (p.frameCount === END_FRAME) {
-      console.log('done');
+      console.log('~~~Preparing to render gif.');
       gif.render();
     }
   };
