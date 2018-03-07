@@ -2,19 +2,10 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import P5Wrapper from 'react-p5-wrapper';
 import Webcam from 'react-webcam';
-import socket from 'socket.io-client';
 import { Rectangle } from 'react-shapes';
 
+import client from './socket';
 import sketch from './sketch';
-
-const serverUrl = 'http://localhost:3000';
-
-const socketOptions = {
-  transports: ['websocket'],
-  'force new connection': true
-};
-
-const client = socket.connect(serverUrl, socketOptions);
 
 const H_KEYCODE = 72;
 const SPACEBAR_KEYCODE = 32;
@@ -30,6 +21,24 @@ export default class App extends Component {
       isLoading: false
     };
     this.capture = this.capture.bind(this);
+
+    client.on('generating', (data) => {
+      this.updatePayload('isGenerating', data);
+    });
+
+    client.on('is_loading', (data) => {
+      this.updatePayload('isLoading', data);
+    });
+  }
+
+  updatePayload (k, v) {
+    console.log(`updatePayload generating data for ${k}`, v);
+    if (k === 'isGenerating') {
+      this.setState({ isGenerating: v });
+    }
+    if (k === 'isLoading') {
+      this.setState({ isLoading: v });
+    }
   }
 
   capture (event) {
@@ -98,20 +107,6 @@ export default class App extends Component {
       this.client.on('faces', (faces) => {
         this.addFaces(faces);
       });
-
-      this.client.on('is_loading', (data) => {
-        this.setState({
-          isLoading: data
-        });
-      });
-
-      this.client.on('generating', (data) => {
-        console.log('data', data);
-        this.setState({
-          isGenerating: data,
-          isLoading: false
-        });
-      });
     });
   }
 
@@ -121,6 +116,7 @@ export default class App extends Component {
 
   render () {
     const style = {position: 'static', top: 0, left: 0, minWidth: '100%'};
+    // todo: why doesn't the camera come back?
     return (
       <div className='container'>
         { this.state.isLoading

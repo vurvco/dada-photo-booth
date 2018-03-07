@@ -1,4 +1,4 @@
-import io from 'socket.io-client';
+import client from './socket';
 import 'p5/lib/addons/p5.dom';
 
 let capture;
@@ -9,14 +9,6 @@ const fileType = 'jpg';
 
 const START_FRAME = 15;
 const END_FRAME = 115;
-
-const serverUrl = 'http://localhost:3000';
-
-const socketOptions = {
-  transports: ['websocket'],
-  'force new connection': true
-};
-const socket = io(serverUrl, socketOptions);
 
 function setupGif () {
   // eslint-disable-next-line no-undef
@@ -29,8 +21,7 @@ function setupGif () {
 
   gif.on('finished', (blob) => {
     console.log('~~~Downloading.');
-    // Blob is sent to server, where it is saved as a gif
-    socket.emit('save_gif', blob);
+    client.emit('save_gif', blob);
     setupGif();
   });
 }

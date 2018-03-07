@@ -78,6 +78,7 @@ io.on('connection', (socket) => {
           })
           .then(() => copyImage(dir))
           .then(() => {
+            console.log(`Copied image to ${dir}`);
             socket.emit('is_loading', false);
             socket.emit('generating', true);
           })
@@ -91,19 +92,21 @@ io.on('connection', (socket) => {
 
   socket.on('save_gif', (blob) => {
     console.log('~~~Blob received.');
+
     saveImage(blob, 'glitch.gif')
-      // this console.log is logged to server console...
-      .then(() => console.log('~~~Gif saved.\n'))
-      .then(() => postToFirebase())
+      .then(() => {
+        console.log('~~~Gif saved.\n');
+        return postToFirebase();
+      })
       .then((res) => {
         console.log(`Glitch image added to Firebase: ${res}`);
         return postToTwitter();
       })
       .then((tweet) => {
         console.log(`Tweet: ${tweet}`);
-        // ...but this doesn't seem to work on Electron app
-        // todo: :point_down: this needs to get picked up by Electron app
+        socket.emit('is_loading', false);
         socket.emit('generating', false);
+        console.log('generated');
       })
       .catch((err) => {
         console.log(`err: ${err}\n`);
