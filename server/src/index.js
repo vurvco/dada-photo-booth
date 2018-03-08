@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
     const dst = './croppedByServer.jpg';
     const dir = '../camera/public';
 
-    socket.emit('is_loading', true);
+    socket.emit('state', { isLoading: true });
 
     saveImage(payload, 'cropped.jpg')
       .then(() => {
@@ -75,18 +75,17 @@ io.on('connection', (socket) => {
           .then((returned) => {
             console.log({ x, y, width, height });
             console.log(`returned: ${JSON.stringify(returned, null, 2)}\n`);
+            return copyImage(dir);
           })
-          .then(() => copyImage(dir))
           .then(() => {
             console.log(`Copied image to ${dir}`);
-            socket.emit('is_loading', false);
-            socket.emit('generating', true);
+            socket.emit('state', { isLoading: false, isGenerating: true });
           })
           .catch(err => console.error(err));
       })
       .catch((err) => {
         console.log('err', err);
-        socket.emit('generating', false);
+        socket.emit('state', { isGenerating: false });
       });
   });
 
@@ -104,8 +103,7 @@ io.on('connection', (socket) => {
       })
       .then((tweet) => {
         console.log(`Tweet: ${tweet}`);
-        socket.emit('is_loading', false);
-        socket.emit('generating', false);
+        socket.emit('state', { isLoading: false, isGenerating: false });
         console.log('generated');
       })
       .catch((err) => {
