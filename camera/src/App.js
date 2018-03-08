@@ -22,23 +22,9 @@ export default class App extends Component {
     };
     this.capture = this.capture.bind(this);
 
-    client.on('generating', (data) => {
-      this.updatePayload('isGenerating', data);
+    client.on('state', (data) => {
+      this.setState(data);
     });
-
-    client.on('is_loading', (data) => {
-      this.updatePayload('isLoading', data);
-    });
-  }
-
-  updatePayload (k, v) {
-    console.log(`updatePayload generating data for ${k}`, v);
-    if (k === 'isGenerating') {
-      this.setState({ isGenerating: v });
-    }
-    if (k === 'isLoading') {
-      this.setState({ isLoading: v });
-    }
   }
 
   capture (event) {
@@ -116,7 +102,6 @@ export default class App extends Component {
 
   render () {
     const style = {position: 'static', top: 0, left: 0, minWidth: '100%'};
-    // todo: why doesn't the camera come back?
     return (
       <div className='container'>
         { this.state.isLoading
