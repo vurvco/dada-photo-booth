@@ -104,11 +104,10 @@ io.on('connection', (socket) => {
       .then((tweet) => {
         console.log(`Tweet: ${tweet}`);
         socket.emit('state', { isLoading: false, isGenerating: false });
-        console.log('generated');
       })
       .catch((err) => {
         console.log(`err: ${err}\n`);
-        socket.emit('generating', false);
+        socket.emit('state', { isGenerating: false });
       });
   });
 });
