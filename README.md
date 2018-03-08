@@ -23,3 +23,8 @@ _Ensure you have node.js and npm installed, as well as ImageMagick and maybe Ope
 - `npm start` in `server`
 - `npm run watch` in `camera` before...
 - `npm start` in `camera`
+
+## Credits
+
+_todo: add list of software used because this wouldn't be possible without all those rad people sharing their rad work_
+[this gist on saving gifs from p5 canvas](https://gist.github.com/antiboredom/129fd2311dec0046603e)
