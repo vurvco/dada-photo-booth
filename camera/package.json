@@ -23,9 +23,10 @@
     "electron-prebuilt": "^0.36.9",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
+    "react-p5-wrapper": "0.0.4",
     "react-shapes": "^0.1.0",
     "react-webcam": "^0.0.12",
-    "socket.io-client": "^1.4.5"
+    "socket.io-client": "^1.7.4"
   },
   "main": "main.js",
   "scripts": {

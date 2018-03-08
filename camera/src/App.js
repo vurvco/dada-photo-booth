@@ -1,30 +1,30 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import P5Wrapper from 'react-p5-wrapper';
 import Webcam from 'react-webcam';
-import socket from 'socket.io-client';
 import { Rectangle } from 'react-shapes';
 
-const serverUrl = 'http://localhost:3000';
-
-const socketOptions = {
-  transports: ['websocket'],
-  'force new connection': true
-};
-
-const client = socket.connect(serverUrl, socketOptions);
+import client from './socket';
+import sketch from './sketch';
 
 const H_KEYCODE = 72;
 const SPACEBAR_KEYCODE = 32;
 
-const Processing = ({ res }) => (<div style={{color: 'white'}}>
-  {res ? <p>!!!!!!cool shit from adam!!!!!!</p> : <p>d'oh!</p>}
-</div>);
+const Loading = ({ style }) => <div style={style}>it loading</div>;
 
 export default class App extends Component {
   constructor (props) {
     super(props);
-    this.state = { isGenerating: false };
+    this.state = {
+      sketch,
+      isGenerating: false,
+      isLoading: false
+    };
     this.capture = this.capture.bind(this);
+
+    client.on('state', (data) => {
+      this.setState(data);
+    });
   }
 
   capture (event) {
@@ -36,11 +36,6 @@ export default class App extends Component {
     if (event.keyCode === SPACEBAR_KEYCODE) {
       const imageSrc = this.refs.webcam.getScreenshot();
       this.client.emit('camera_upload', imageSrc);
-      this.setState({ isGenerating: true });
-
-      setTimeout(() => {
-        this.setState({ isGenerating: false });
-      }, 2000);
     }
   }
 
@@ -49,7 +44,9 @@ export default class App extends Component {
       if (this.refs.webcam) {
         const screenshot = this.refs.webcam.getScreenshot();
         if (screenshot) {
-          this.client.emit('image', {base64: screenshot.toString()});
+          this.client.emit('image', {
+            base64: screenshot.toString()
+          });
         }
       }
     }, 150);
@@ -65,7 +62,7 @@ export default class App extends Component {
         {array.map(function (rect, i) {
           const topRectangle = `${rect.y}px`;
           const leftRectangle = `${rect.x}px`;
-          const styleRectangle = {
+          const styleRect = {
             position: 'fixed',
             top: topRectangle,
             left: leftRectangle,
@@ -74,7 +71,7 @@ export default class App extends Component {
 
           if (!isGenerating) client.emit('coordinates', rect);
 
-          return <div key={i} style={styleRectangle}>
+          return <div key={i} style={styleRect}>
             <Rectangle width={rect.width}
               height={rect.height}
               fill={{color: '#2409ba', alpha: 4}}
@@ -93,11 +90,7 @@ export default class App extends Component {
     client.on('connect', () => {
       this.client = client;
 
-      this.client.on('generating', ({ isGenerating }) => {
-        this.setState({ isGenerating });
-      });
-
-      this.client.on('faces', faces => {
+      this.client.on('faces', (faces) => {
         this.addFaces(faces);
       });
     });
@@ -108,20 +101,22 @@ export default class App extends Component {
   }
 
   render () {
-    const style = {position: 'static', top: 0, left: 0, 'minWidth': '100%'};
+    const style = {position: 'static', top: 0, left: 0, minWidth: '100%'};
     return (
       <div className='container'>
-        { this.state.isGenerating
-        ? <Processing res={this.state.isGenerating} />
-        : (<div>
-          <div className='faces' />
-          <div style={style}>
-            <Webcam screenshotFormat='image/jpeg'
-              ref='webcam'
-              audio={false}
-              onUserMedia={this.getFaces.bind(this)} />
-          </div>
-        </div>)
+        { this.state.isLoading
+        ? <Loading style={{color: 'white'}} />
+        : (this.state.isGenerating
+          ? <P5Wrapper sketch={this.state.sketch} />
+          : (<div>
+            <div className='faces' />
+            <div style={style}>
+              <Webcam screenshotFormat='image/jpeg'
+                ref='webcam'
+                audio={false}
+                onUserMedia={this.getFaces.bind(this)} />
+            </div>
+          </div>))
       }
       </div>
     );

@@ -6,3 +6,4 @@ server/output/
 server/tmp/
 
 firebase-admin-key.json
+camera/public/croppedByServer.jpg

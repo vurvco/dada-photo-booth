@@ -9,12 +9,10 @@ import { retrieve } from './modules/images';
 
 import oneGif from './img/1.gif';
 import twoGif from './img/2.gif';
-import threeGif from './img/3.gif';
 
 const placeholders = [
   oneGif,
-  twoGif,
-  threeGif
+  twoGif
 ];
 
 export class App extends React.Component {

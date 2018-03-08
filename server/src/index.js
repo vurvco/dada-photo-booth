@@ -5,8 +5,10 @@ import Opencv from 'opencv';
 import { crop } from 'easyimage';
 
 import Image from './models/image';
+import copyImage from '../lib/copyImage';
 import saveImage from '../lib/saveImage';
-// import gifOut from '../lib/gifOut';
+import postToFirebase from '../lib/postToFirebase';
+import postToTwitter from '../lib/postToTwitter';
 
 const io = Io();
 
@@ -62,6 +64,9 @@ io.on('connection', (socket) => {
 
     const src = './cropped.jpg';
     const dst = './croppedByServer.jpg';
+    const dir = '../camera/public';
+
+    socket.emit('state', { isLoading: true });
 
     saveImage(payload, 'cropped.jpg')
       .then(() => {
@@ -70,29 +75,39 @@ io.on('connection', (socket) => {
           .then((returned) => {
             console.log({ x, y, width, height });
             console.log(`returned: ${JSON.stringify(returned, null, 2)}\n`);
-            socket.emit('generating', { isGenerating: true });
-
-            // placeholder that will be replaced with p5 sketch process
-            setTimeout(() => {
-              socket.emit('generating', { isGenerating: false });
-            }, 3000);
-          });
+            return copyImage(dir);
+          })
+          .then(() => {
+            console.log(`Copied image to ${dir}`);
+            socket.emit('state', { isLoading: false, isGenerating: true });
+          })
+          .catch(err => console.error(err));
       })
       .catch((err) => {
         console.log('err', err);
-        socket.emit('gif_response', { response: false });
+        socket.emit('state', { isGenerating: false });
       });
   });
 
   socket.on('save_gif', (blob) => {
+    console.log('~~~Blob received.');
+
     saveImage(blob, 'glitch.gif')
       .then(() => {
-        console.log('~~~Image saved.\n');
-        socket.emit('saved_gif_response', 'ok');
+        console.log('~~~Gif saved.\n');
+        return postToFirebase();
       })
-      .catch(err => {
+      .then((res) => {
+        console.log(`Glitch image added to Firebase: ${res}`);
+        return postToTwitter();
+      })
+      .then((tweet) => {
+        console.log(`Tweet: ${tweet}`);
+        socket.emit('state', { isLoading: false, isGenerating: false });
+      })
+      .catch((err) => {
         console.log(`err: ${err}\n`);
-        socket.emit('saved_gif_response', 'not ok');
+        socket.emit('state', { isGenerating: false });
       });
   });
 });
