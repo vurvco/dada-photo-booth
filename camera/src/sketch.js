@@ -7,16 +7,15 @@ let img;
 const imgFileName = 'croppedByServer';
 const fileType = 'jpg';
 
-const START_FRAME = 15;
-const END_FRAME = 115;
+const START_FRAME = 1999;
+const END_FRAME = 2350;
 
 function setupGif () {
   // eslint-disable-next-line no-undef
   gif = new GIF({
-    // todo: how many workers?
-    // todo: will changing quality speed it up?
-    workers: 2,
-    quality: 40
+    workers: 4,
+    quality: 20,
+    debug: true
   });
 
   gif.on('finished', (blob) => {
@@ -67,10 +66,6 @@ export default function sketch (p) {
 
     // apply a posterized filter effect to the colors being randomly generated
     p.filter(p.POSTERIZE, 6);
-    /*
-    filter(POSTERIZE, random(19,21));
-    filter(INVERT);
-    */
 
     if (p.frameCount > START_FRAME &&
       p.frameCount < END_FRAME) {

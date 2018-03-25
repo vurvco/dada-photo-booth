@@ -102,11 +102,11 @@ io.on('connection', (socket) => {
         return postToTwitter();
       })
       .then((tweet) => {
-        console.log(`Tweet: ${tweet}`);
+        console.log(`Tweet: ${JSON.stringify(tweet, null, 2)}`);
         socket.emit('state', { isLoading: false, isGenerating: false });
       })
       .catch((err) => {
-        console.log(`err: ${err}\n`);
+        console.log(`err: ${JSON.stringify(err, null, 2)}\n`);
         socket.emit('state', { isGenerating: false });
       });
   });
