@@ -35,7 +35,8 @@ const postGifToTimeline = (media) => {
 
 const main = () => {
   return uploadGif()
-    .then(postGifToTimeline);
+    .then(postGifToTimeline)
+    .catch(err => console.log(err));
 };
 
 module.exports = main;
