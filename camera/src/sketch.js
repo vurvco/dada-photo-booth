@@ -34,9 +34,8 @@ export default function sketch (p) {
   p.setup = () => {
     p.createCanvas(img.width, img.height);
 
-    // todo: tweak these settings
     capture = p.createCapture(p.VIDEO);
-    capture.size(320, 240);
+    capture.size(640, 480);
     capture.hide();
     setupGif();
 

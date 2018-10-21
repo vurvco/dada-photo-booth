@@ -21,6 +21,7 @@ const app = admin.initializeApp({
 
 // Utils
 const saveLocallyAs = (name) => `cp glitch.gif ${name}`;
+const deleteFile = (name) => `rm ${name}`;
 
 // File Upload
 const storage = app.storage();
@@ -43,7 +44,8 @@ const main = () => {
   const newName = `${uuid.v4()}.gif`;
   return exec(saveLocallyAs(newName))
     .then(() => uploadFile(newName))
-    .then(() => saveFilenameToDatabase(newName));
+    .then(() => saveFilenameToDatabase(newName))
+    .then(() => deleteFile(newName));
 };
 
 module.exports = main;
