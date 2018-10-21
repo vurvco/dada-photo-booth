@@ -10,7 +10,7 @@ import sketch from './sketch';
 const H_KEYCODE = 72;
 const SPACEBAR_KEYCODE = 32;
 
-const Loading = ({ style }) => <div style={style}>it loading</div>;
+const Loading = ({ style }) => <div style={style} />;
 
 export default class App extends Component {
   constructor (props) {
@@ -107,7 +107,9 @@ export default class App extends Component {
         { this.state.isLoading
         ? <Loading style={{color: 'white'}} />
         : (this.state.isGenerating
-          ? <P5Wrapper sketch={this.state.sketch} />
+          ? (<div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', paddingTop: '40%'}}>
+            <P5Wrapper sketch={this.state.sketch} style={{width: '80%'}} />
+          </div>)
           : (<div>
             <div className='faces' />
             <div style={style}>
