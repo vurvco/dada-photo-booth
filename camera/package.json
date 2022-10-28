@@ -26,7 +26,7 @@
     "react-p5-wrapper": "0.0.4",
     "react-shapes": "^0.1.0",
     "react-webcam": "^0.0.12",
-    "socket.io-client": "^1.7.4"
+    "socket.io-client": "^4.5.3"
   },
   "main": "main.js",
   "scripts": {
